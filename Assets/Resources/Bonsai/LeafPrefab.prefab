@@ -22,7 +22,7 @@ GameObject:
   - 135: {fileID: 135000010728338204}
   - 114: {fileID: 114000011675122484}
   m_Layer: 0
-  m_Name: Leaf_Pentagonal_Prefab
+  m_Name: LeafPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
