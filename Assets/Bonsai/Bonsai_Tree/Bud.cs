@@ -27,9 +27,9 @@ public class Bud : MonoBehaviour {
 	/*
 	 * Grows this bud into either a branch or leaf
 	 */
-	public void processGrowthCycle(GameObject branch, GameObject leaf, GameObject bud) {
+	public void processGrowthCycle() {
 		if(isLeaf) {
-			GameObject newLeaf = Instantiate(leaf, Vector3.zero, Quaternion.identity, transform.parent) as GameObject;
+			GameObject newLeaf = Instantiate(Resources.Load("Bonsai/LeafPrefab"), Vector3.zero, Quaternion.identity, transform.parent) as GameObject;
 			newLeaf.transform.localPosition = transform.localPosition;
 			newLeaf.transform.localRotation = transform.localRotation;
 			newLeaf.transform.Rotate(-90, 0, 0);
@@ -42,7 +42,7 @@ public class Bud : MonoBehaviour {
 			Destroy(this.gameObject);
 		}
 		else {
-			GameObject newBranch = Instantiate(branch, Vector3.zero, Quaternion.identity, transform.parent) as GameObject;
+			GameObject newBranch = Instantiate(Resources.Load("Bonsai/BranchPrefab"), Vector3.zero, Quaternion.identity, transform.parent) as GameObject;
 			newBranch.transform.localPosition = transform.localPosition;
 			newBranch.transform.localRotation = transform.localRotation;
 			newBranch.transform.Rotate(-90, 0, 0);

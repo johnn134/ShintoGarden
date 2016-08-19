@@ -12,11 +12,11 @@ public class Leaf : MonoBehaviour {
 	int depth = 0;                  //The depth of this leaf on the tree
 	int minAcceptableCoverage = 1;  //Number of leaves allowed to overshadow this leaf each growth cycle
 
-	float darkVal = 0.1f;
-	float deadAlpha = 0.75f;
+	float DARKEN_VALUE = 0.1f;
+	float DARKEN_ALPHA = 0.75f;
 
 	bool canSnip;       //Whether this leaf can be snipped or not
-	bool isAlive;       //Whether the leaf is alive or not
+	bool isDead;       //Whether the leaf is alive or not
 
 	static int ID = 0;
 
@@ -24,7 +24,7 @@ public class Leaf : MonoBehaviour {
 	void Start() {
 		age = 0;
 		canSnip = true;
-		isAlive = true;
+		isDead = false;
 
 		//name the leaf
 		this.gameObject.name = "Leaf_" + ID;
@@ -48,16 +48,15 @@ public class Leaf : MonoBehaviour {
 	/*
 	 * Ages this leaf
 	 */
-	public void processGrowthCycle(GameObject branch, GameObject leaf, GameObject bud) {
+	public void processGrowthCycle() {
 		age++;
 
 		//Check for the leaf to die if alive
-		if(isAlive)
-			setIsAlive(checkForLife());
+		checkForDeath();
 	}
 
 	/*
-	 * Wrapper for checking if the leaf will remain alive
+	 * Checks if the leaf will remain alive
 	 * Leaf will live if one of these is satisfied:
 	 * - it is on a branch tip
 	 * - its parent branch is higher than its child branches and
@@ -65,8 +64,23 @@ public class Leaf : MonoBehaviour {
 	 * - it is facing above the horizon and
 	 *   it has an acceptable number of leaves hanging above it
 	 */
-	bool checkForLife() {
-		return checkForBranchTip() || ((checkIsParentBranchHigher() || checkFacingAboveTheHorizon()) && checkOverhangingLeaves() <= minAcceptableCoverage);
+	void checkForDeath() {
+		if(!isDead) {
+			if(!(checkForBranchTip() || ((checkIsParentBranchHigher() || checkFacingAboveTheHorizon()) && checkOverhangingLeaves() <= minAcceptableCoverage))) {   //Dying
+				makeLeafDead();
+			}
+		}
+	}
+
+	public void makeLeafDead() {
+		//Set the death time
+		deathTime = age;
+
+		//Darken the leaf to show it is dead
+		Color oldColor = transform.GetChild(0).GetComponent<MeshRenderer>().material.color;
+		setVisualColor(new Color (oldColor.r * DARKEN_VALUE, oldColor.g * DARKEN_VALUE, oldColor.b * DARKEN_VALUE, DARKEN_ALPHA));
+
+		isDead = true;
 	}
 
 	/*
@@ -98,26 +112,10 @@ public class Leaf : MonoBehaviour {
 	}
 
 	/*
-	 * Sets the isAlive boolean and changes the leaf to the dead of alive state
+	 * Return isDead
 	 */
-	public void setIsAlive(bool newIsAlive) {
-		if(!isAlive && newIsAlive) {    //Reviving
-			setWPosition(w);
-		}
-		else if(isAlive && !newIsAlive) {   //Dying
-											//Set the death time
-			deathTime = age;
-
-			//Darken the leaf to show it is dead
-			Color oldColor = transform.GetChild(0).GetComponent<MeshRenderer>().material.color;
-			setVisualColor(new Color(oldColor.r * darkVal, oldColor.g * darkVal, oldColor.b * darkVal, deadAlpha));
-		}
-
-		isAlive = newIsAlive;
-	}
-
-	public bool getIsAlive() {
-		return isAlive;
+	public bool getIsDead() {
+		return isDead;
 	}
 
 	/*
@@ -140,28 +138,43 @@ public class Leaf : MonoBehaviour {
 	public void setWPosition(int newW) {
 		w = newW;
 
+		assignColorToWPosition();
+	}
+
+	/*
+	 * Sets the visual color according to the w position
+	 */
+	void assignColorToWPosition() {
+		float cModifier = 1.0f;
+		float aModifier = 0.5f;
+
+		if(isDead) {
+			cModifier = DARKEN_VALUE;
+			aModifier = DARKEN_ALPHA;
+		}
+
 		//Change Material value
-		switch(w) {
+		switch (w) {
 			case 0:     //red
-				setVisualColor(new Color(1.0f, 0.0f, 0.0f, 0.5f));
+				setVisualColor(new Color (1.0f * cModifier, 0.0f, 0.0f, aModifier));
 				break;
 			case 1:     //orange
-				setVisualColor(new Color(1.0f, 0.5f, 0.0f, 0.5f));
+				setVisualColor(new Color (1.0f * cModifier, 0.5f * cModifier, 0.0f, aModifier));
 				break;
 			case 2:     //yellow
-				setVisualColor(new Color(1.0f, 1.0f, 0.0f, 0.5f));
+				setVisualColor(new Color (1.0f * cModifier, 1.0f * cModifier, 0.0f, aModifier));
 				break;
 			case 3:     //green
-				setVisualColor(new Color(0.0f, 1.0f, 0.0f, 0.5f));
+				setVisualColor(new Color (0.0f, 1.0f * cModifier, 0.0f, aModifier));
 				break;
 			case 4:     //blue
-				setVisualColor(new Color(0.0f, 1.0f, 1.0f, 0.5f));
+				setVisualColor(new Color (0.0f, 1.0f * cModifier, 1.0f * cModifier, aModifier));
 				break;
 			case 5:     //indigo
-				setVisualColor(new Color(0.0f, 0.0f, 1.0f, 0.5f));
+				setVisualColor(new Color (0.0f, 0.0f, 1.0f * cModifier, aModifier));
 				break;
 			case 6:     //violet
-				setVisualColor(new Color(1.0f, 0.0f, 1.0f, 0.5f));
+				setVisualColor(new Color (1.0f * cModifier, 0.0f, 1.0f * cModifier, aModifier));
 				break;
 		}
 	}
