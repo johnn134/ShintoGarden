@@ -28,7 +28,7 @@ GameObject:
   - 136: {fileID: 13655686}
   - 114: {fileID: 114000012371103230}
   m_Layer: 0
-  m_Name: Branch
+  m_Name: BranchPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

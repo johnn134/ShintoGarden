@@ -27,7 +27,7 @@ GameObject:
   - 4: {fileID: 447900}
   - 114: {fileID: 114000014222842120}
   m_Layer: 0
-  m_Name: Bud
+  m_Name: BudPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

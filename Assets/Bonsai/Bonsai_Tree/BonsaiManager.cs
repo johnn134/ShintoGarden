@@ -4,9 +4,11 @@ using System.Collections;
 public class BonsaiManager : MonoBehaviour {
 
     public GameObject branch;
-    public GameObject stem;
     public GameObject bud;
     public GameObject leaf;
+
+	public int maxLeaves = 30;
+	public int maxBranches = 30;
 
     GameObject baseBranch;
 
@@ -22,7 +24,7 @@ public class BonsaiManager : MonoBehaviour {
 		ID++;
 
 		//Create the base branch
-		baseBranch = Instantiate(branch, transform) as GameObject;
+		baseBranch = Instantiate(Resources.Load("Bonsai/BranchPrefab"), transform) as GameObject;
 		baseBranch.transform.localPosition = Vector3.zero;
 		baseBranch.GetComponent<Branch>().setcanSnip(false);
 		baseBranch.GetComponent<Branch>().setDepth(0);
@@ -32,13 +34,14 @@ public class BonsaiManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		//Testing code for growing the tree with the spacebar
 		if(Input.GetKeyDown(KeyCode.Space)) {
-			processGrowthCycle(branch, leaf, bud);
+			processGrowthCycle();
 		}
 	}
 
-	void processGrowthCycle(GameObject branch, GameObject leaf, GameObject bud) {
-		baseBranch.GetComponent<Branch>().processGrowthCycle(branch, leaf, bud);
+	void processGrowthCycle() {
+		baseBranch.GetComponent<Branch>().processGrowthCycle();
 	}
 
 	public void addLeaf() {
@@ -55,5 +58,13 @@ public class BonsaiManager : MonoBehaviour {
 
 	public void removeBranch() {
 		numBranches--;
+	}
+
+	public bool canMakeLeaf() {
+		return numLeaves < maxLeaves;
+	}
+
+	public bool canMakeBranch() {
+		return numBranches < maxBranches;
 	}
 }

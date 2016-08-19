@@ -4,53 +4,73 @@ using System.Collections;
 public class Branch : MonoBehaviour {
 
 	GameObject manager; //Reference to the BonsaiManager
-	GameObject branch;  //Branch prefab
-	GameObject leaf;    //Leaf bundle prefab
-	GameObject bud;     //Bud prefab
 
-	int age;            //How many growth cycles has this branch lived through
-	int numLeaves;      //Number of leaves on this branch
-	int numBranches;    //Number of branches on this branch
-	int growthStep;     //Marks which step of the growth order is in effect
-	int growthCounter;  //Counter for iterating through branch children
-	int w;              //Position on the fourth dimension
-	int deathTime;
+	int age;            	//How many growth cycles has this branch lived through
+	int numLeaves;      	//Number of leaves on this branch
+	int numBranches;    	//Number of branches on this branch
+	int numBugs;
+	int growthStep;     	//Marks which step of the growth order is in effect
+	int growthCounter;  	//Counter for iterating through branch children
+	int leavesDeathTime;	//The age at which all of this branch's leaves died
+	int infestationTime;	//The age at which this branch was infested with bugs
+	int deathTime;			//The age at which this branch died
 
-	float budRange;     //Maximum distance from the center of the branch tip to grow a bud
-	float leafRange;    //Stores the radius of the rounded branch tip
-
-	bool canSnip;       //Tells whether this branch can be snipped off
-	bool hasDisease;    //Is this branch diseased
-	bool hasBugs;       //Does ths branch have bugs on it
-	bool runGrowth;     //Tells whether the branch should be growing
-	bool isTip;         //True if this branch has no child branches
-
-	int branchMin = 1;              //Minimum number of branch buds that will initially grow
-	int branchMax = 3;              //Maximum number of branch buds that can ever grow from this branch
-	int leafMin = 0;                //Minimum number of leaf buds that can grow
-	int leafMax = 5;                //Maximum number of leaf buds that can ever grow
-	int maxPlacementAttempts = 20;  //Maximum attempts for a bud to place itself before giving up
 	int branchGrowthCycle = 3;      //Must be at least 1, number of growth cycles between growing new branches
-	int leafGrowthCycle = 2;        //Must be at least 1, number of growth cycles between growing new leaves
-	int minLeafDepth = 3;           //Must be at least 0, depth of branches before leaves can grow
-	int depth = 0;                  //The depth of this branch in the tree
+	int leafGrowthCycle = 3;        //Must be at least 1, number of growth cycles between growing new leaves
+	int depth = 0;              //The depth of this branch in the tree
+	int w = 0;              	//Position on the fourth dimension
 
-	float budOffset = 60.0f;        //Minimum angle between new branch buds
-	float leafOffset = 45.0f;       //Minimum angle between new leaf buds
-	float darkVal = 0.1f;
-	float darkAlpha = 0.75f;
+	float budRange;     	//Maximum distance from the center of the branch tip to grow a bud
+	float leafRange;    	//Stores the radius of the rounded branch tip
 
-	static int ID = 0;
+	bool canSnip;       	//Tells whether this branch can be snipped off
+	bool runGrowth;     	//Tells whether the branch should be growing
+	bool isTip;         	//True if this branch has no child branches
+	bool isDead;    		//Is this branch diseased
+	bool isInfested;    	//Does ths branch have bugs on it
+	bool leavesAreDead;		//Are all leaves on this branch dead
+
+	const int BRANCH_MIN = 1;              	//Minimum number of branch buds that will initially grow
+	const int BRANCH_MAX = 3;              	//Maximum number of branch buds that can ever grow from this branch
+	const int LEAF_MIN = 0;                	//Minimum number of leaf buds that can grow
+	const int LEAF_MAX = 5;                	//Maximum number of leaf buds that can ever grow
+	const int BUG_MIN = 3;					//Minimum number of bugs that can infest the branch
+	const int BUG_MAX = 5;					//Maximum number of bugs that can infest the branch
+	const int MIN_LEAF_DEPTH = 3;			//Must be at least 0, depth of branches before leaves can grow
+	const int MAX_PLACEMENT_ATTEMPTS = 20;  //Maximum attempts for a bud to place itself before giving up
+	const int TIME_TILL_INFESTATION = 1;	//Must be at least 0, number of growth cycles after leaves have died till infestation
+	const int TIME_TILL_DEATH = 2;			//Must be at least 0, number of growth cycles after infestation until death
+	const int INFESTATION_COOLDOWN = 2;
+	const int INFESTATION_LIFETIME = TIME_TILL_DEATH + 1;	//Must be at least equal to time_till_death, 
+															//number of cycles between infestation start and finish
+
+	const float BUD_OFFSET = 60.0f;			//Minimum angle between new branch buds
+	const float LEAF_OFFSET = 45.0f;		//Minimum angle between new leaf buds
+	const float DARKEN_VALUE = 0.1f;		//Value multiplied to the material color on death
+	const float DARKEN_ALPHA = 0.75f;		//Value of material color alpha on death
+
+	static int ID = 0;	//Unique branch identifier
 
 	// Use this for initialization
 	void Start() {
+		//Initialize variables
 		age = 0;
 		numLeaves = 0;
 		numBranches = 0;
+		growthStep = 0;
+		numBugs = 0;
+
 		canSnip = true;
-		hasDisease = false;
-		hasBugs = false;
+		runGrowth = false;
 		isTip = true;
+
+		//Infestation and Death variables
+		leavesDeathTime = -1;
+		infestationTime = -1;
+		deathTime = -1;
+		isDead = false;
+		isInfested = false;
+		leavesAreDead = false;
 
 		budRange = transform.GetChild(0).GetChild(2).localScale.x / 2.0f * 0.9f;
 		leafRange = transform.GetChild(0).GetChild(2).localScale.x / 2.0f;
@@ -77,14 +97,15 @@ public class Branch : MonoBehaviour {
 			else {  //Process the branch parts in growth order
 				bool nextStep = false;
 
-				//Growth order: check for disease, age leaves, evolve buds, grow new buds, process next branch
+				//Growth order: check infestation stage, age leaves, evolve buds, grow new buds, process next branch
 				switch(growthStep) {
 					case 0:
-						checkForDisease();
+						processInfestation();
 						nextStep = true;
 						break;
 					case 1:
-						nextStep = processLeaves();
+						processLeaves();
+						nextStep = true;
 						break;
 					case 2:
 						nextStep = processBuds();
@@ -97,6 +118,7 @@ public class Branch : MonoBehaviour {
 						nextStep = processBranches();
 						break;
 				}
+
 				if(nextStep) {  //reset counter for next growth step
 					growthStep++;
 					growthCounter = transform.childCount - 1;
@@ -120,13 +142,8 @@ public class Branch : MonoBehaviour {
 	/*
 	 * Initiates the growth cycle for this branch and children parts
 	 */
-	public void processGrowthCycle(GameObject newBranch, GameObject newLeaf, GameObject newBud) {
+	public void processGrowthCycle() {
 		if(!runGrowth) {
-			//Grab prefabs
-			branch = newBranch;
-			leaf = newLeaf;
-			bud = newBud;
-
 			//Start growth cycle
 			runGrowth = true;
 			growthStep = 0;
@@ -147,7 +164,7 @@ public class Branch : MonoBehaviour {
 		Transform temp = transform.GetChild(growthCounter);
 		if(temp.name.Length >= 6) {
 			if(temp.name.Substring(0, 6) == "Branch") {
-				temp.GetComponent<Branch>().processGrowthCycle(branch, leaf, bud);
+				temp.GetComponent<Branch>().processGrowthCycle();
 			}
 		}
 
@@ -162,11 +179,8 @@ public class Branch : MonoBehaviour {
 			return true;
 		}
 
-		Transform temp = transform.GetChild(growthCounter);
-		if(temp.name.Length >= 3) {
-			if(temp.name.Substring(0, 3) == "Bud") {
-				temp.GetComponent<Bud>().processGrowthCycle(branch, leaf, bud);
-			}
+		if(transform.GetChild(growthCounter).GetComponent<Bud>() != null) {
+			transform.GetChild(growthCounter).GetComponent<Bud>().processGrowthCycle();
 		}
 
 		return false;
@@ -175,39 +189,32 @@ public class Branch : MonoBehaviour {
 	/*
 	 * Calls the processGrowthCycle on the currently focused leaf
 	 */
-	bool processLeaves() {
-		if(growthCounter <= 2) {
-			return true;
-		}
-
-		Transform temp = transform.GetChild(growthCounter);
-		if(temp.name.Length >= 4) {
-			if(temp.name.Substring(0, 4) == "Leaf") {
-				temp.GetComponent<Leaf>().processGrowthCycle(branch, leaf, bud);
+	void processLeaves() {
+		for(int i = transform.childCount - 1; i > 2; i--) {
+			if(transform.GetChild(i).GetComponent<Leaf>() != null) {
+				transform.GetChild(i).GetComponent<Leaf>().processGrowthCycle();
 			}
 		}
-
-		return false;
 	}
 
 	/*
 	 * Wrapper for growing new leaf and branch buds on the branch
 	 */
 	void growBuds() {
-		if(!hasDisease) {
-			growBranchBuds(bud);
-			growLeafBuds(bud);
+		if(!isDead) {
+			growBranchBuds();
+			growLeafBuds();
 		}
 	}
 
 	/*
 	 * Grows new leaf buds on the surface of the branch
 	 */
-	void growLeafBuds(GameObject bud) {
+	void growLeafBuds() {
 		float tipPoint = transform.GetChild(1).localPosition.y;
 
-		if(numLeaves < leafMax && age % leafGrowthCycle == 0 && depth >= minLeafDepth) {
-			int numBuds = Random.Range(leafMin, leafMax - numLeaves);
+		if(numLeaves < LEAF_MAX && age % leafGrowthCycle == 0 && depth >= MIN_LEAF_DEPTH) {
+			int numBuds = Random.Range(LEAF_MIN, LEAF_MAX - numLeaves);
 
 			Vector3[] leafPositions = new Vector3[numBuds + numLeaves];
 			Quaternion[] leafRotations = new Quaternion[numBuds + numLeaves];
@@ -230,7 +237,7 @@ public class Branch : MonoBehaviour {
 
 				float yPos = Random.Range(0, tipPoint + leafRange);
 
-				while(!foundPos && attempts < maxPlacementAttempts) {
+				while(!foundPos && attempts < MAX_PLACEMENT_ATTEMPTS) {
 					spawnPos = Vector3.zero;    //reset spawn pos
 
 					if(yPos > tipPoint) { //Must place leaves on the sphere surface
@@ -261,7 +268,7 @@ public class Branch : MonoBehaviour {
 
 							foundPos = true;
 							for(int j = 0; j < i + numLeaves; j++) {
-								if(Quaternion.Angle(leafRotations[j], spawnRot) <= leafOffset) {
+								if(Quaternion.Angle(leafRotations[j], spawnRot) <= LEAF_OFFSET) {
 									foundPos = false;
 									attempts++;
 								}
@@ -281,7 +288,7 @@ public class Branch : MonoBehaviour {
 
 						foundPos = true;
 						for(int j = 0; j < i + numLeaves; j++) {
-							if(Quaternion.Angle(leafRotations[j], spawnRot) <= leafOffset) {
+							if(Quaternion.Angle(leafRotations[j], spawnRot) <= LEAF_OFFSET) {
 								foundPos = false;
 								attempts++;
 							}
@@ -289,7 +296,7 @@ public class Branch : MonoBehaviour {
 					}
 				}
 
-				if(attempts >= maxPlacementAttempts) {
+				if(attempts >= MAX_PLACEMENT_ATTEMPTS) {
 					Debug.Log("Failed to find a spot for new leaves");
 					break;
 				}
@@ -299,7 +306,7 @@ public class Branch : MonoBehaviour {
 				leafRotations[i + numLeaves] = spawnRot;
 
 				//Add the bud at the found position and rotation
-				addBud(bud, spawnPos, spawnRot, true);
+				addBud(spawnPos, spawnRot, true);
 			}
 		}
 	}
@@ -307,10 +314,10 @@ public class Branch : MonoBehaviour {
 	/*
 	 * Grows new branch buds on the surface of the tip of the branch
 	 */
-	void growBranchBuds(GameObject bud) {
-		if(numBranches < branchMax && age % branchGrowthCycle == 1) {
+	void growBranchBuds() {
+		if(numBranches < BRANCH_MAX && age % branchGrowthCycle == 1) {
 			//Note that Range is exculsive for the max so the branchMax must be increased by 1
-			int numBuds = numBranches > 0 ? Random.Range(0, branchMax + 1 - numBranches) : Random.Range(branchMin, branchMax + 1);
+			int numBuds = numBranches > 0 ? Random.Range(0, BRANCH_MAX + 1 - numBranches) : Random.Range(BRANCH_MIN, BRANCH_MAX + 1);
 
 			Quaternion[] branchRotations = new Quaternion[numBuds + numBranches];
 
@@ -333,7 +340,7 @@ public class Branch : MonoBehaviour {
 
 				//Attempt to find a position to place the branch bud on the tip of
 				//this branch within the allowed attempts limit
-				while(!foundPos && attempts < maxPlacementAttempts) {
+				while(!foundPos && attempts < MAX_PLACEMENT_ATTEMPTS) {
 					spawnPos = originPos;   //Reset the spawn pos to origin
 
 					//Find a Vector3 position on the surface of the rounded tip of the branch
@@ -349,14 +356,14 @@ public class Branch : MonoBehaviour {
 
 					foundPos = true;
 					for(int j = 0; j < i + numBranches; j++) {
-						if(Quaternion.Angle(branchRotations[j], spawnRot) <= budOffset) {
+						if(Quaternion.Angle(branchRotations[j], spawnRot) <= BUD_OFFSET) {
 							foundPos = false;
 							attempts++;
 						}
 					}
 				}
 
-				if(attempts >= maxPlacementAttempts) {
+				if(attempts >= MAX_PLACEMENT_ATTEMPTS) {
 					Debug.Log("Failed to find a spot for new branches");
 					break;
 				}
@@ -365,9 +372,42 @@ public class Branch : MonoBehaviour {
 				branchRotations[i + numBranches] = spawnRot;
 
 				//Add the bud at the found position and rotation
-				addBud(bud, spawnPos, spawnRot, false);
+				addBud(spawnPos, spawnRot, false);
 			}
 		}
+	}
+
+	/*
+	 * Adds a new bud of the given type at the given position and rotation
+	 */
+	void addBud(Vector3 pos, Quaternion rot, bool isLeaf) {
+		//Instantiate bud
+		GameObject newBud = Instantiate(Resources.Load("Bonsai/BudPrefab"), Vector3.zero, Quaternion.identity, transform) as GameObject;	
+
+		//Initialize new bud transform
+		newBud.transform.localPosition = pos;
+		newBud.transform.localRotation = rot;
+
+		//Initialize new bud variables
+		newBud.transform.GetComponent<Bud>().setisLeaf(isLeaf);
+		newBud.transform.GetComponent<Bud>().setDepth(depth + 1);
+		newBud.transform.GetComponent<Bud>().setWPosition(Mathf.Clamp(w + Random.Range(-1, 2), 0, 6));   //the w value is clamped between 0 and 6 inclusive
+		newBud.transform.GetComponent<Bud>().setManager(manager);
+	}
+
+	/*
+	 * Returns an array of branch Gameobjects that are children of this branch
+	 */
+	GameObject[] getBranchChildren() {
+		GameObject[] branchChildren = new GameObject[numBranches];
+		int counter = 0;
+		foreach (Transform child in transform) {
+			if(child.GetComponent<Branch>() != null) {
+				branchChildren [counter] = child.gameObject;
+				counter++;
+			}
+		}
+		return branchChildren;
 	}
 
 	/*
@@ -385,6 +425,21 @@ public class Branch : MonoBehaviour {
 		}
 
 		return q;
+	}
+
+	/*
+	 * Returns an array of leaf Gameobjects that are children of this branch
+	 */
+	GameObject[] getLeafChildren() {
+		GameObject[] leafChildren = new GameObject[numLeaves];
+		int counter = 0;
+		foreach (Transform child in transform) {
+			if(child.GetComponent<Leaf>() != null) {
+				leafChildren [counter] = child.gameObject;
+				counter++;
+			}
+		}
+		return leafChildren;
 	}
 
 	/*
@@ -422,35 +477,51 @@ public class Branch : MonoBehaviour {
 	}
 
 	/*
-	 * Adds a new bud of the given type at the given position and rotation
+	 * Determines the correct action to take for the current stage of infestation
 	 */
-	void addBud(GameObject bud, Vector3 pos, Quaternion rot, bool isLeaf) {
-		GameObject newBud = Instantiate(bud, Vector3.zero, Quaternion.identity) as GameObject;
-		newBud.transform.parent = transform;
-		newBud.transform.localPosition = pos;
-		newBud.transform.localRotation = rot;
-		newBud.transform.GetComponent<Bud>().setisLeaf(isLeaf);
-		newBud.transform.GetComponent<Bud>().setDepth(depth + 1);
-		newBud.transform.GetComponent<Bud>().setWPosition(Mathf.Clamp(w + Random.Range(-1, 2), 0, 6));   //the w value is clamped between 0 and 6 inclusive
-		newBud.transform.GetComponent<Bud>().setManager(manager);
+	void processInfestation() {
+		if(!isDead && !isInfested) {	//Branch is alive and clean
+			//Check if all of the branches leaves have died
+			bool tempLAD = checkIfAllLeavesAreDead();
+
+			if(!tempLAD && leavesAreDead) {	//leaves were dead but a new leaf grew
+				leavesAreDead = false;
+				leavesDeathTime = -1;
+			}
+			else if(tempLAD && !leavesAreDead) {	//leaves have just died
+				leavesAreDead = true;
+				leavesDeathTime = age;
+			}
+			else if(tempLAD && leavesAreDead) {	//leaves have been dead
+				if(age >= leavesDeathTime + TIME_TILL_INFESTATION) {	//Time to create infestation
+					addInfestationToBranch();
+				}
+			}
+
+			/*** if leaves are alive and they weren't dead then do nothing ***/
+		}
+		else if(isInfested) {
+			//Check for infestation effects
+			if(!isDead) {	//is alive and infested
+				if(age >= infestationTime + TIME_TILL_DEATH) {	//Time to kill branch
+					addDeathToBranch();
+				}
+			}
+
+			//Check for removing infestation
+			if(age >= infestationTime + INFESTATION_LIFETIME) {
+				removeInfestation();
+			}
+			else if(age > infestationTime) {
+				spreadInfestation();
+			}
+		}
+
+		/*** Branch is dead and clean so nothing happens ***/
 	}
 
 	/*
-	 * Checks if this branch will become diseased or 
-	 * spread the disease if already diseased
-	 */
-	void checkForDisease() {
-		if(!hasDisease) {
-			setHasDisease(checkIfAllLeavesAreDead() || checkIfParentIsDiseased());
-		}
-		else {
-			spreadDisease();
-		}
-	}
-
-	/*
-	 * Checks all child leaves to see if they are dead
-	 * if all child leaves are dead then this branch will become diseased
+	 * Returns true if all child leaves are dead, false if any are alive
 	 */
 	bool checkIfAllLeavesAreDead() {
 		if(numLeaves == 0)
@@ -460,11 +531,9 @@ public class Branch : MonoBehaviour {
 
 		//Check all child leaves
 		for(int i = transform.childCount - 1; i > 2; i--) {
-			if(transform.GetChild(i).name.Length >= 4) {
-				if(transform.GetChild(i).name.Substring(0, 4) == "Leaf") {
-					if(transform.GetChild(i).GetComponent<Leaf>().getIsAlive()) {
-						allDead = false;
-					}
+			if(transform.GetChild(i).GetComponent<Leaf>() != null) {
+				if(!transform.GetChild(i).GetComponent<Leaf>().getIsDead()) {
+					allDead = false;
 				}
 			}
 		}
@@ -473,66 +542,98 @@ public class Branch : MonoBehaviour {
 	}
 
 	/*
-	 * Checks if the parent branch is diseased
+	 * Adds the infestation effect to this branch
 	 */
-	bool checkIfParentIsDiseased() {
-		if(depth > 0) {
-			Branch bm = transform.parent.GetComponent<Branch>();
-			if(bm.hasDisease) {
-				if(bm.age >= bm.deathTime) {
-					return true;
-				}
-			}
+	void addInfestationToBranch() {
+		if(!isInfested && age > deathTime + INFESTATION_LIFETIME - TIME_TILL_DEATH + INFESTATION_COOLDOWN) {
+			isInfested = true;
+			infestationTime = age;
+			addBugs();
 		}
-		return false;
 	}
 
 	/*
-	 * Modifies this branch to move into the diseased or health state from its previous state
+	 * Determines the number of bugs to be added and their positions
 	 */
-	void setHasDisease(bool newHasDisease) {
-		if(!hasDisease && newHasDisease) {  //The branch will be changed to diseased
-			deathTime = age + 1;    //We add 1 because the tree is aged at the end of the growth process
+	void addBugs() {
+		int numBugs = Random.Range(BUG_MIN, BUG_MAX + 1);	//create a random number of bugs between min and max
 
-			//Darken Branch
-			Color old = transform.GetChild(0).GetChild(2).GetComponent<MeshRenderer>().material.color;
-			setVisualColor(new Color(old.r * darkVal, old.g * darkVal, old.b * darkVal, darkAlpha));
-		}
-		else if(hasDisease && !newHasDisease) { //The branch will be changed to healthy
-			setWPosition(w);
-		}
+		for(int i = 0; i < numBugs; i++) {
+			//Find a point on the surface of the cylinder of the branch
+			float newX = Random.Range(-leafRange, leafRange);
+			float newZRange = Mathf.Sqrt(leafRange * leafRange - newX * newX);
+			float newZ = Random.Range(-newZRange, newZRange);
 
-		hasDisease = newHasDisease;
+			addBug(new Vector3(newX, 0, newZ));	//create new bug
+		}
 	}
 
 	/*
-	 * Spreads the disease to all children and the branch's parent
+	 * Create and attach bug to branch
 	 */
-	void spreadDisease() {
-		//Spread disease to children
-		for(int i = transform.childCount - 1; i > 2; i--) {
-			/*
-			if(transform.GetChild(i).name.Length >= 6) {
-				if(transform.GetChild(i).name.Substring(0, 6) == "Branch") {
-					transform.GetChild(i).GetComponent<Branch>().setHasDisease(true);
-				}
-			}
-			else*/
-			if(transform.GetChild(i).name.Length >= 4) {
-				if(transform.GetChild(i).name.Substring(0, 4) == "Leaf") {
-					transform.GetChild(i).GetComponent<Leaf>().setIsAlive(false);
-				}
-			}
-			else if(transform.GetChild(i).name.Length >= 3) {
-				if(transform.GetChild(i).name.Substring(0, 3) == "Bud") {
-					Destroy(transform.GetChild(i).gameObject);
-				}
+	void addBug(Vector3 newPos) {
+		GameObject newBug = Instantiate(Resources.Load("Bonsai/BugPrefab"), Vector3.zero, Quaternion.identity, transform) as GameObject;
+		newBug.transform.localPosition = newPos;
+		newBug.transform.localRotation = Quaternion.identity;
+		newBug.GetComponent<BonsaiBug>().setWPosition(w);
+		newBug.GetComponent<BonsaiBug>().setYOrigin(transform.GetChild(1).localPosition.y / 2);
+		newBug.GetComponent<BonsaiBug>().setMovementRange(transform.GetChild(1).localPosition.y / 2);
+
+		numBugs++;
+	}
+
+	/*
+	 * Removes the infestation and bugs from this branch
+	 */
+	void removeInfestation() {
+		//Reset variables
+		isInfested = false;
+		infestationTime = -1;
+
+		//Destroy each bug
+		GameObject[] bugs = new GameObject[numBugs];
+		int counter = 0;
+
+		for(int i = 0; i < transform.childCount; i++) {
+			if(transform.GetChild(i).GetComponent<BonsaiBug>() != null) {
+				bugs[counter] = transform.GetChild(i).gameObject;
+				counter++;
 			}
 		}
 
-		//Spread disease to parent
+		for(int i = 0; i < numBugs; i++) {
+			Destroy(bugs[i]);
+		}
+	}
+
+	/*
+	 * Spreads this branch's infestation to adjacent branches
+	 */
+	void spreadInfestation() {
+		//Spread to children
+		foreach (GameObject g in getBranchChildren()) {
+			g.GetComponent<Branch>().addInfestationToBranch();
+		}
+
+		//Spread to parent
 		if(depth > 1)
-			transform.parent.GetComponent<Branch>().setHasDisease(true);
+			transform.parent.GetComponent<Branch>().addInfestationToBranch();
+	}
+
+	/*
+	 * Adds the death effect to this branch
+	 */
+	void addDeathToBranch() {
+		isDead = true;
+		deathTime = age;
+
+		for(int i = transform.childCount - 1; i > 2; i--) {
+			if(transform.GetChild(i).GetComponent<Leaf>() != null) {
+				transform.GetChild(i).GetComponent<Leaf>().makeLeafDead();
+			}
+		}
+
+		assignColorToWPosition();
 	}
 
 	/*
@@ -591,28 +692,43 @@ public class Branch : MonoBehaviour {
 	public void setWPosition(int newW) {
 		w = newW;
 
+		assignColorToWPosition();
+	}
+
+	/*
+	 * Sets the visual color according to the w position
+	 */
+	void assignColorToWPosition() {
+		float cModifier = 1.0f;
+		float aModifier = 0.5f;
+
+		if(isDead) {
+			cModifier = DARKEN_VALUE;
+			aModifier = DARKEN_ALPHA;
+		}
+
 		//Change Material value
-		switch(w) {
+		switch (w) {
 			case 0:     //red
-				setVisualColor(new Color(1.0f, 0.0f, 0.0f, 0.5f));
+				setVisualColor(new Color (1.0f * cModifier, 0.0f, 0.0f, aModifier));
 				break;
 			case 1:     //orange
-				setVisualColor(new Color(1.0f, 0.5f, 0.0f, 0.5f));
+				setVisualColor(new Color (1.0f * cModifier, 0.5f * cModifier, 0.0f, aModifier));
 				break;
 			case 2:     //yellow
-				setVisualColor(new Color(1.0f, 1.0f, 0.0f, 0.5f));
+				setVisualColor(new Color (1.0f * cModifier, 1.0f * cModifier, 0.0f, aModifier));
 				break;
 			case 3:     //green
-				setVisualColor(new Color(0.0f, 1.0f, 0.0f, 0.5f));
+				setVisualColor(new Color (0.0f, 1.0f * cModifier, 0.0f, aModifier));
 				break;
 			case 4:     //blue
-				setVisualColor(new Color(0.0f, 1.0f, 1.0f, 0.5f));
+				setVisualColor(new Color (0.0f, 1.0f * cModifier, 1.0f * cModifier, aModifier));
 				break;
 			case 5:     //indigo
-				setVisualColor(new Color(0.0f, 0.0f, 1.0f, 0.5f));
+				setVisualColor(new Color (0.0f, 0.0f, 1.0f * cModifier, aModifier));
 				break;
 			case 6:     //violet
-				setVisualColor(new Color(1.0f, 0.0f, 1.0f, 0.5f));
+				setVisualColor(new Color (1.0f * cModifier, 0.0f, 1.0f * cModifier, aModifier));
 				break;
 		}
 	}
@@ -633,10 +749,17 @@ public class Branch : MonoBehaviour {
 		manager = newManager;
 	}
 
+	/*
+	 * Returns isTip
+	 */
 	public bool getIsTip() {
 		return isTip;
 	}
 
+	/*
+	 * Returns whether the base point of this branch has a greater y value 
+	 * than the base point of its children branches
+	 */
 	public bool getIsHigherThanChildren() {
 		if(numBranches == 0) {
 			return true;
