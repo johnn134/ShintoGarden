@@ -31,6 +31,11 @@ public class Leaf : MonoBehaviour {
 		ID++;
 	}
 
+	void OnDestroy() {
+		transform.parent.GetComponent<Branch>().registerLeafRemoved();
+		manager.GetComponent<BonsaiManager>().removeLeaf();
+	}
+
 	// Update is called once per frame
 	void Update() {
 
@@ -39,9 +44,17 @@ public class Leaf : MonoBehaviour {
 	//Snips this leaf when clicked
 	void OnMouseDown() {
 		if(canSnip) {
-			transform.parent.GetComponent<Branch>().registerLeafRemoved();
-			manager.GetComponent<BonsaiManager>().removeLeaf();
 			Destroy(this.gameObject);
+		}
+	}
+
+	void OnTriggerEnter(Collider other) {
+		if(other.transform.parent != null) {
+			if(other.transform.parent.GetComponent<Shears>() != null) {
+				if(canSnip) {
+					Destroy(this.gameObject);
+				}
+			}
 		}
 	}
 
