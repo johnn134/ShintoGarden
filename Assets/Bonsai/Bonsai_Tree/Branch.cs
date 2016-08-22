@@ -139,6 +139,17 @@ public class Branch : MonoBehaviour {
 		}
 	}
 
+	void OnTriggerEnter(Collider other) {
+		if(other.transform.parent != null) {
+			if(other.transform.parent.GetComponent<Insecticide>() != null) {	//Insecticide Spray Collision
+				if(isInfested) {
+					Debug.Log("Spray has removed the infestation");
+					removeInfestation();
+				}
+			}
+		}
+	}
+
 	/*
 	 * Initiates the growth cycle for this branch and children parts
 	 */
@@ -576,7 +587,7 @@ public class Branch : MonoBehaviour {
 		newBug.transform.localPosition = newPos;
 		newBug.transform.localRotation = Quaternion.identity;
 		newBug.GetComponent<BonsaiBug>().setWPosition(w);
-		newBug.GetComponent<BonsaiBug>().setYOrigin(transform.GetChild(1).localPosition.y / 2);
+		newBug.GetComponent<BonsaiBug>().setOrigin(newPos.x, transform.GetChild(1).localPosition.y / 2, newPos.z);
 		newBug.GetComponent<BonsaiBug>().setMovementRange(transform.GetChild(1).localPosition.y / 2);
 
 		numBugs++;
@@ -602,7 +613,8 @@ public class Branch : MonoBehaviour {
 		}
 
 		for(int i = 0; i < numBugs; i++) {
-			Destroy(bugs[i]);
+			bugs[i].transform.parent = null;
+			bugs[i].GetComponent<BonsaiBug>().startDeath();
 		}
 	}
 
