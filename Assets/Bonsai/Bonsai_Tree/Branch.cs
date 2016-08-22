@@ -80,6 +80,11 @@ public class Branch : MonoBehaviour {
 		ID++;
 	}
 
+	void OnDestroy() {
+		transform.parent.GetComponent<Branch>().registerBranchRemoved();
+		manager.GetComponent<BonsaiManager>().removeBranch();
+	}
+
 	// Update is called once per frame
 	void Update() {
 
@@ -133,8 +138,6 @@ public class Branch : MonoBehaviour {
 	//Clip this branch when clicked
 	void OnMouseDown() {
 		if(canSnip) {
-			transform.parent.GetComponent<Branch>().registerBranchRemoved();
-			manager.GetComponent<BonsaiManager>().removeBranch();
 			Destroy(this.gameObject);
 		}
 	}
@@ -145,6 +148,11 @@ public class Branch : MonoBehaviour {
 				if(isInfested) {
 					Debug.Log("Spray has removed the infestation");
 					removeInfestation();
+				}
+			}
+			else if(other.transform.parent.GetComponent<Shears>() != null) {
+				if(canSnip) {
+					Destroy(this.gameObject);
 				}
 			}
 		}
