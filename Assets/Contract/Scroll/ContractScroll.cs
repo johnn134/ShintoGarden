@@ -81,7 +81,7 @@ public class ContractScroll : MonoBehaviour {
 		if(child.localPosition == childEnd) {
 			isScrolling = false;
 
-			if(isActive = false) {	//closed the scroll
+			if(isActive == false) {	//closed the scroll
 				//Accept the contract and move to the next level
 
 				/*** To-Do: Implement level changing ***/
@@ -105,6 +105,7 @@ public class ContractScroll : MonoBehaviour {
 	 * public method for closing the scroll by player interaction
 	 */
 	public void closeScroll() {
+		Debug.Log("Closing Scroll");
 		scrollBottomStartPos = transform.GetChild(0).GetChild(1).localPosition;
 		scrollDragPointStartPos = transform.GetChild(2).localPosition;
 
