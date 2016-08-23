@@ -81,7 +81,11 @@ public class Branch : MonoBehaviour {
 	}
 
 	void OnDestroy() {
-		transform.parent.GetComponent<Branch>().registerBranchRemoved();
+		if(transform.parent != null) {
+			if(transform.parent.GetComponent<Branch>() != null) {
+				transform.parent.GetComponent<Branch>().registerBranchRemoved();
+			}
+		}
 		manager.GetComponent<BonsaiManager>().removeBranch();
 	}
 

@@ -9,14 +9,14 @@ public class Shears : MonoBehaviour {
 	void Start () {
 		startedSnip = false;
 
-		transform.GetChild(1).GetComponent<SphereCollider>().enabled = false;
+		transform.GetChild(1).GetComponent<BoxCollider>().enabled = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		//Check for turning off collisions for snipping
 		if(startedSnip) {
-			transform.GetChild(1).GetComponent<SphereCollider>().enabled = false;
+			transform.GetChild(1).GetComponent<BoxCollider>().enabled = false;
 			startedSnip = false;
 		}
 
@@ -27,7 +27,7 @@ public class Shears : MonoBehaviour {
 	}
 
 	void snip() {
-		transform.GetChild(1).GetComponent<SphereCollider>().enabled = true;
+		transform.GetChild(1).GetComponent<BoxCollider>().enabled = true;
 		startedSnip = true;
 	}
 }
