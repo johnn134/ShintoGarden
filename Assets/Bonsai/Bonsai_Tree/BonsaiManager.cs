@@ -10,6 +10,8 @@ public class BonsaiManager : MonoBehaviour {
 	public int maxLeaves = 30;
 	public int maxBranches = 30;
 
+	public float growthCycleTime = 60.0f;
+
     GameObject baseBranch;
 
 	int numLeaves;
@@ -38,6 +40,13 @@ public class BonsaiManager : MonoBehaviour {
 		if(Input.GetKeyDown(KeyCode.Space)) {
 			processGrowthCycle();
 		}
+
+		/*
+		//Grow tree on a timer
+		if(Time.time % growthCycleTime == 0) {
+			processGrowthCycle();
+		}
+		*/
 	}
 
 	void processGrowthCycle() {

@@ -6,11 +6,11 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: 4DBonsaiOrderMat
-  m_Shader: {fileID: 4800000, guid: d94c6bdf7248d8e408e3fc65d9eb6017, type: 3}
+  m_Name: New Material 1
+  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: _EMISSION
   m_LightmapFlags: 1
-  m_CustomRenderQueue: 3002
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   m_SavedProperties:
     serializedVersion: 2
@@ -80,9 +80,6 @@ Material:
         name: _DetailNormalMapScale
       second: 1
     - first:
-        name: _Dim
-      second: 0.771
-    - first:
         name: _DstBlend
       second: 0
     - first:
@@ -94,9 +91,6 @@ Material:
     - first:
         name: _GlossyReflections
       second: 1
-    - first:
-        name: _LitOutlineThickness
-      second: 0
     - first:
         name: _Metallic
       second: 0
@@ -110,9 +104,6 @@ Material:
         name: _Parallax
       second: 0.02
     - first:
-        name: _Shadow
-      second: 1
-    - first:
         name: _SmoothnessTextureChannel
       second: 0
     - first:
@@ -122,16 +113,7 @@ Material:
         name: _SrcBlend
       second: 1
     - first:
-        name: _Threshold
-      second: 0.36
-    - first:
         name: _UVSec
-      second: 0
-    - first:
-        name: _UnlitOutlineThickness
-      second: 0
-    - first:
-        name: _WPos
       second: 0
     - first:
         name: _ZWrite
@@ -142,7 +124,4 @@ Material:
       second: {r: 1, g: 1, b: 1, a: 1}
     - first:
         name: _EmissionColor
-      second: {r: 0, g: 0, b: 0, a: 1}
-    - first:
-        name: _OutlineColor
       second: {r: 0, g: 0, b: 0, a: 1}
