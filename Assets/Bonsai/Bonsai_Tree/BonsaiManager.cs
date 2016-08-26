@@ -16,11 +16,21 @@ public class BonsaiManager : MonoBehaviour {
 
 	int numLeaves;
 	int numBranches;
+	int numDeadLeaves;
+	int numDeadBranches;
+	int numInfestedBranches;
 
 	static int ID = 0;
 
 	// Use this for initialization
 	void Start () {
+		//initialize variables
+		numLeaves = 0;
+		numBranches = 1;	//1 for the base branch
+		numDeadLeaves = 0;
+		numDeadBranches = 0;
+		numInfestedBranches = 0;
+
 		//Name the tree
 		this.gameObject.name = "BonsaiTree_" + ID;
 		ID++;
@@ -69,11 +79,55 @@ public class BonsaiManager : MonoBehaviour {
 		numBranches--;
 	}
 
+	public void addDeadLeaf() {
+		numDeadLeaves++;
+	}
+
+	public void removeDeadLeaf() {
+		numDeadLeaves--;
+	}
+
+	public void addDeadBranch() {
+		numDeadBranches++;
+	}
+
+	public void removeDeadBranch() {
+		numDeadBranches--;
+	}
+
+	public void addInfestedBranch() {
+		numInfestedBranches++;
+	}
+
+	public void removeInfestedBranch() {
+		numInfestedBranches--;
+	}
+
 	public bool canMakeLeaf() {
 		return numLeaves < maxLeaves;
 	}
 
 	public bool canMakeBranch() {
 		return numBranches < maxBranches;
+	}
+
+	public int getNumLeaves() {
+		return numLeaves;
+	}
+
+	public int getNumBranches() {
+		return numBranches;
+	}
+
+	public int getNumInfestedBranches() {
+		return numInfestedBranches;
+	}
+
+	public int getNumDeadLeaves() {
+		return numDeadLeaves;
+	}
+
+	public int getNumDeadBranches() {
+		return numDeadBranches;
 	}
 }
