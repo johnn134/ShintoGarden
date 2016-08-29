@@ -10,13 +10,12 @@ GameObject:
   - 4: {fileID: 440666}
   - 33: {fileID: 3300946}
   - 23: {fileID: 2313058}
-  - 114: {fileID: 114000013101231202}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &154770
 GameObject:
@@ -32,7 +31,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &440666
 Transform:
@@ -54,7 +53,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 154770}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6416113, y: 0.015, z: 3.713755}
+  m_LocalPosition: {x: 0.43541163, y: 1.015, z: 0.2851689}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -108,23 +107,6 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 154770}
   m_IsPrefabParent: 1
---- !u!114 &114000013101231202
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 101484}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d2a6c386c10fb442af28b4ae0134d28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  w: 0
-  dullCoef: 1
-  w_depth: 0
-  IVDManager: {fileID: 0}
-  isParent: 0
-  vanishWhenTransparent: 0
 --- !u!114 &114000014222842120
 MonoBehaviour:
   m_ObjectHideFlags: 1

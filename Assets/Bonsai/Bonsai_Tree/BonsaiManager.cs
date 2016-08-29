@@ -40,8 +40,13 @@ public class BonsaiManager : MonoBehaviour {
 		baseBranch.transform.localPosition = Vector3.zero;
 		baseBranch.GetComponent<Branch>().setcanSnip(false);
 		baseBranch.GetComponent<Branch>().setDepth(0);
-		baseBranch.GetComponent<Branch>().setWPosition(3);
+
+		//baseBranch.GetComponent<Branch>().setWPosition(3);
+		baseBranch.GetComponent<HyperColliderManager>().setW(3);
+		baseBranch.GetComponent<HyperColliderManager>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
+
 		baseBranch.GetComponent<Branch>().setManager(this.gameObject);
+		InvokeRepeating("processGrowthCycle", growthCycleTime, growthCycleTime);
 	}
 	
 	// Update is called once per frame

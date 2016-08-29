@@ -26,7 +26,7 @@ public class Shears : MonoBehaviour {
 		}
 	}
 
-	void snip() {
+	public void snip() {
 		transform.GetChild(1).GetComponent<BoxCollider>().enabled = true;
 		startedSnip = true;
 	}

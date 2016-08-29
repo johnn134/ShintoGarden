@@ -32,8 +32,15 @@ public class Leaf : MonoBehaviour {
 	}
 
 	void OnDestroy() {
-		transform.parent.GetComponent<Branch>().registerLeafRemoved();
-		manager.GetComponent<BonsaiManager>().removeLeaf();
+		if (transform.parent != null)
+		{
+			if (transform.parent.GetComponent<Branch>() != null)
+			{
+				transform.parent.GetComponent<Branch>().registerLeafRemoved();
+			}
+		}
+		if (manager != null)
+			manager.GetComponent<BonsaiManager>().removeLeaf();
 	}
 
 	// Update is called once per frame
@@ -90,8 +97,10 @@ public class Leaf : MonoBehaviour {
 		deathTime = age;
 
 		//Darken the leaf to show it is dead
-		Color oldColor = transform.GetChild(0).GetComponent<MeshRenderer>().material.color;
-		setVisualColor(new Color (oldColor.r * DARKEN_VALUE, oldColor.g * DARKEN_VALUE, oldColor.b * DARKEN_VALUE, DARKEN_ALPHA));
+		//Color oldColor = transform.GetChild(0).GetComponent<MeshRenderer>().material.color;
+		//setVisualColor(new Color (oldColor.r * DARKEN_VALUE, oldColor.g * DARKEN_VALUE, oldColor.b * DARKEN_VALUE, DARKEN_ALPHA));
+		transform.GetChild(0).GetComponent<HyperObject>().dullCoef = 4;
+		transform.GetChild(0).GetComponent<HyperObject>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
 
 		isDead = true;
 	}

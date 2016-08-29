@@ -19,15 +19,18 @@ public class Insecticide : MonoBehaviour {
 		}
 	}
 
-	void startSpray() {
+	public void startSpray() {
 		//Begin Particle Effect
 		transform.GetChild(2).GetComponent<ParticleSystem>().Play();
 
 		//Turn on collisions
 		transform.GetChild(1).GetComponent<CapsuleCollider>().enabled = true;
+
+		CancelInvoke();
+		Invoke("endSpray", .2f);
 	}
 
-	void endSpray() {
+	public void endSpray() {
 		//End Particle Effect
 		transform.GetChild(2).GetComponent<ParticleSystem>().Stop();
 
