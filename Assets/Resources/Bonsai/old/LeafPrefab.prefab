@@ -21,13 +21,12 @@ GameObject:
   - 4: {fileID: 4000013679230666}
   - 135: {fileID: 135000010728338204}
   - 114: {fileID: 114000011675122484}
-  - 114: {fileID: 114000013606221390}
   m_Layer: 0
   m_Name: LeafPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1000012795345470
 GameObject:
@@ -42,7 +41,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1 &1000014009051068
 GameObject:
@@ -55,13 +54,12 @@ GameObject:
   - 33: {fileID: 33000010132166220}
   - 23: {fileID: 23000011129657582}
   - 95: {fileID: 95000012711366990}
-  - 114: {fileID: 114000010702778250}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &4000010776174794
 Transform:
@@ -96,7 +94,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000012448826300}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.79355806, y: 0.0028791726, z: 2.927789}
+  m_LocalPosition: {x: 2.8531542, y: 0, z: 2.4758062}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -157,23 +155,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114000010702778250
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000014009051068}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d2a6c386c10fb442af28b4ae0134d28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  w: 0
-  dullCoef: 1
-  w_depth: 0
-  IVDManager: {fileID: 0}
-  isParent: 0
-  vanishWhenTransparent: 0
 --- !u!114 &114000011675122484
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -185,22 +166,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc7d09415ebca5c4c867fad6ea6d2584, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114000013606221390
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012448826300}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b2ea3c5e3eebf7498f83916e20700fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  w: 0
-  movable: 0
-  w_depth: 0
-  IVDManager: {fileID: 0}
-  isParent: 1
 --- !u!135 &135000010728338204
 SphereCollider:
   m_ObjectHideFlags: 1

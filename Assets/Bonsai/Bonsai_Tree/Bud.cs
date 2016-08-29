@@ -34,9 +34,12 @@ public class Bud : MonoBehaviour {
 			newLeaf.transform.localRotation = transform.localRotation;
 			newLeaf.transform.Rotate(-90, 0, 0);
 			newLeaf.transform.GetComponent<Leaf>().setDepth(depth);
-			newLeaf.transform.GetComponent<Leaf>().setWPosition(w);
-			newLeaf.transform.GetComponent<Leaf>().setManager(manager);
 
+			//newLeaf.transform.GetComponent<Leaf>().setWPosition(w);
+			newLeaf.GetComponent<HyperColliderManager>().setW(transform.GetChild(0).GetComponent<HyperObject>().w);
+			newLeaf.GetComponent<HyperColliderManager>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
+
+			newLeaf.transform.GetComponent<Leaf>().setManager(manager);
 			transform.parent.GetComponent<Branch>().registerLeafAdded();
 			manager.GetComponent<BonsaiManager>().addLeaf();
 			Destroy(this.gameObject);
@@ -47,9 +50,12 @@ public class Bud : MonoBehaviour {
 			newBranch.transform.localRotation = transform.localRotation;
 			newBranch.transform.Rotate(-90, 0, 0);
 			newBranch.transform.GetComponent<Branch>().setDepth(depth);
-			newBranch.transform.GetComponent<Branch>().setWPosition(w);
-			newBranch.transform.GetComponent<Branch>().setManager(manager);
 
+			//newBranch.transform.GetComponent<Branch>().setWPosition(w);
+			newBranch.GetComponent<HyperColliderManager>().setW(transform.GetChild(0).GetComponent<HyperObject>().w);
+			newBranch.GetComponent<HyperColliderManager>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
+
+			newBranch.transform.GetComponent<Branch>().setManager(manager);
 			transform.parent.GetComponent<Branch>().registerBranchAdded();
 			manager.GetComponent<BonsaiManager>().addBranch();
 			Destroy(this.gameObject);

@@ -21,12 +21,13 @@ GameObject:
   - 4: {fileID: 4000012514755520}
   - 33: {fileID: 33000010745295128}
   - 23: {fileID: 23000011452289526}
+  - 114: {fileID: 114000012854168616}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1000011768524314
 GameObject:
@@ -39,12 +40,13 @@ GameObject:
   - 114: {fileID: 114000013614050122}
   - 54: {fileID: 54000011775300368}
   - 65: {fileID: 65000013811385276}
+  - 114: {fileID: 114000010077299712}
   m_Layer: 0
   m_Name: BugPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &4000012514755520
 Transform:
@@ -66,7 +68,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000011768524314}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.143, z: 0}
+  m_LocalPosition: {x: 0.7729162, y: -5.1745878e-17, z: 2.3304272}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -136,6 +138,39 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.02, y: 0.04, z: 0.02}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114000010077299712
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000011768524314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b2ea3c5e3eebf7498f83916e20700fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  w: 0
+  movable: 0
+  w_depth: 0
+  IVDManager: {fileID: 0}
+  isParent: 1
+--- !u!114 &114000012854168616
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010636178364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d2a6c386c10fb442af28b4ae0134d28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  w: 0
+  dullCoef: 1
+  w_depth: 0
+  IVDManager: {fileID: 0}
+  isParent: 0
+  vanishWhenTransparent: 0
 --- !u!114 &114000013614050122
 MonoBehaviour:
   m_ObjectHideFlags: 1

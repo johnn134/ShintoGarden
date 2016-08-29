@@ -22,13 +22,13 @@ public class Branch : MonoBehaviour {
 
 	float budRange;     	//Maximum distance from the center of the branch tip to grow a bud
 	float leafRange;    	//Stores the radius of the rounded branch tip
-
-	bool canSnip;       	//Tells whether this branch can be snipped off
 	bool runGrowth;     	//Tells whether the branch should be growing
 	bool isTip;         	//True if this branch has no child branches
 	bool isDead;    		//Is this branch diseased
 	bool isInfested;    	//Does ths branch have bugs on it
 	bool leavesAreDead;		//Are all leaves on this branch dead
+
+	bool canSnip = true;       	//Tells whether this branch can be snipped off
 
 	const int BRANCH_MIN = 1;              	//Minimum number of branch buds that will initially grow
 	const int BRANCH_MAX = 3;              	//Maximum number of branch buds that can ever grow from this branch
@@ -60,7 +60,6 @@ public class Branch : MonoBehaviour {
 		growthStep = 0;
 		numBugs = 0;
 
-		canSnip = true;
 		runGrowth = false;
 		isTip = true;
 
@@ -86,7 +85,8 @@ public class Branch : MonoBehaviour {
 				transform.parent.GetComponent<Branch>().registerBranchRemoved();
 			}
 		}
-		manager.GetComponent<BonsaiManager>().removeBranch();
+		if(manager != null)
+			manager.GetComponent<BonsaiManager>().removeBranch();
 	}
 
 	// Update is called once per frame
@@ -154,7 +154,7 @@ public class Branch : MonoBehaviour {
 					removeInfestation();
 				}
 			}
-			else if(other.transform.parent.GetComponent<Shears>() != null) {
+			else if(other.gameObject.name.Equals("ShearZone")) {
 				if(canSnip) {
 					Destroy(this.gameObject);
 				}
@@ -414,7 +414,9 @@ public class Branch : MonoBehaviour {
 		//Initialize new bud variables
 		newBud.transform.GetComponent<Bud>().setisLeaf(isLeaf);
 		newBud.transform.GetComponent<Bud>().setDepth(depth + 1);
-		newBud.transform.GetComponent<Bud>().setWPosition(Mathf.Clamp(w + Random.Range(-1, 2), 0, 6));   //the w value is clamped between 0 and 6 inclusive
+		//newBud.transform.GetComponent<Bud>().setWPosition(Mathf.Clamp(w + Random.Range(-1, 2), 0, 6));   //the w value is clamped between 0 and 6 inclusive
+		newBud.transform.GetChild(0).GetComponent<HyperObject>().setW(Mathf.Clamp(GetComponent<HyperColliderManager>().w + Random.Range(-1, 2), 0, 6));
+		newBud.transform.GetChild(0).GetComponent<HyperObject>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
 		newBud.transform.GetComponent<Bud>().setManager(manager);
 	}
 
@@ -598,7 +600,11 @@ public class Branch : MonoBehaviour {
 		GameObject newBug = Instantiate(Resources.Load("Bonsai/BugPrefab"), Vector3.zero, Quaternion.identity, transform) as GameObject;
 		newBug.transform.localPosition = newPos;
 		newBug.transform.localRotation = Quaternion.identity;
-		newBug.GetComponent<BonsaiBug>().setWPosition(w);
+
+		//newBug.GetComponent<BonsaiBug>().setWPosition(w);
+		newBug.GetComponent<HyperColliderManager>().setW(GetComponent<HyperColliderManager>().w);
+		newBug.GetComponent<HyperColliderManager>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
+
 		newBug.GetComponent<BonsaiBug>().setOrigin(newPos.x, transform.GetChild(1).localPosition.y / 2, newPos.z);
 		newBug.GetComponent<BonsaiBug>().setMovementRange(transform.GetChild(1).localPosition.y / 2);
 
@@ -657,7 +663,12 @@ public class Branch : MonoBehaviour {
 			}
 		}
 
-		assignColorToWPosition();
+		transform.GetChild(0).GetChild(0).GetComponent<HyperObject>().dullCoef = 4;
+		transform.GetChild(0).GetChild(1).GetComponent<HyperObject>().dullCoef = 4;
+		transform.GetChild(0).GetChild(2).GetComponent<HyperObject>().dullCoef = 4;
+		transform.GetChild(0).GetChild(0).GetComponent<HyperObject>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
+		transform.GetChild(0).GetChild(1).GetComponent<HyperObject>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
+		transform.GetChild(0).GetChild(2).GetComponent<HyperObject>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
 	}
 
 	/*
