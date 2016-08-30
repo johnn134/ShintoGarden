@@ -85,8 +85,15 @@ public class Branch : MonoBehaviour {
 				transform.parent.GetComponent<Branch>().registerBranchRemoved();
 			}
 		}
-		if(manager != null)
+		if(manager != null) {
 			manager.GetComponent<BonsaiManager>().removeBranch();
+
+			if(isInfested)
+				manager.GetComponent<BonsaiManager>().removeInfestedBranch();
+			
+			if(isDead)
+				manager.GetComponent<BonsaiManager>().removeDeadBranch();
+		}
 	}
 
 	// Update is called once per frame
@@ -225,8 +232,12 @@ public class Branch : MonoBehaviour {
 	 */
 	void growBuds() {
 		if(!isDead) {
-			growBranchBuds();
-			growLeafBuds();
+			if(manager.GetComponent<BonsaiManager>().getNumBranches() < manager.GetComponent<BonsaiManager>().maxBranches) {
+				growBranchBuds();
+			}
+			if(manager.GetComponent<BonsaiManager>().getNumLeaves() < manager.GetComponent<BonsaiManager>().maxLeaves) {
+				growLeafBuds();
+			}
 		}
 	}
 
@@ -238,6 +249,10 @@ public class Branch : MonoBehaviour {
 
 		if(numLeaves < LEAF_MAX && age % leafGrowthCycle == 0 && depth >= MIN_LEAF_DEPTH) {
 			int numBuds = Random.Range(LEAF_MIN, LEAF_MAX - numLeaves);
+
+			if(manager.GetComponent<BonsaiManager>().getNumLeaves() + numBuds > manager.GetComponent<BonsaiManager>().maxLeaves) {
+				numBuds = manager.GetComponent<BonsaiManager>().maxLeaves - manager.GetComponent<BonsaiManager>().getNumLeaves();
+			}
 
 			Vector3[] leafPositions = new Vector3[numBuds + numLeaves];
 			Quaternion[] leafRotations = new Quaternion[numBuds + numLeaves];
@@ -342,6 +357,10 @@ public class Branch : MonoBehaviour {
 			//Note that Range is exculsive for the max so the branchMax must be increased by 1
 			int numBuds = numBranches > 0 ? Random.Range(0, BRANCH_MAX + 1 - numBranches) : Random.Range(BRANCH_MIN, BRANCH_MAX + 1);
 
+			if(manager.GetComponent<BonsaiManager>().getNumBranches() + numBuds > manager.GetComponent<BonsaiManager>().maxBranches) {
+				numBuds = manager.GetComponent<BonsaiManager>().maxBranches - manager.GetComponent<BonsaiManager>().getNumBranches();
+			}
+
 			Quaternion[] branchRotations = new Quaternion[numBuds + numBranches];
 
 			//Find the positions and rotations of existing branches
@@ -414,10 +433,16 @@ public class Branch : MonoBehaviour {
 		//Initialize new bud variables
 		newBud.transform.GetComponent<Bud>().setisLeaf(isLeaf);
 		newBud.transform.GetComponent<Bud>().setDepth(depth + 1);
+
 		//newBud.transform.GetComponent<Bud>().setWPosition(Mathf.Clamp(w + Random.Range(-1, 2), 0, 6));   //the w value is clamped between 0 and 6 inclusive
 		newBud.transform.GetChild(0).GetComponent<HyperObject>().setW(Mathf.Clamp(GetComponent<HyperColliderManager>().w + Random.Range(-1, 2), 0, 6));
 		newBud.transform.GetChild(0).GetComponent<HyperObject>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
+
 		newBud.transform.GetComponent<Bud>().setManager(manager);
+		if(isLeaf)
+			manager.GetComponent<BonsaiManager>().addLeaf();
+		else
+			manager.GetComponent<BonsaiManager>().addBranch();
 	}
 
 	/*
@@ -573,6 +598,10 @@ public class Branch : MonoBehaviour {
 		if(!isInfested && age > deathTime + INFESTATION_LIFETIME - TIME_TILL_DEATH + INFESTATION_COOLDOWN) {
 			isInfested = true;
 			infestationTime = age;
+
+			if(manager != null)
+				manager.GetComponent<BonsaiManager>().addInfestedBranch();
+			
 			addBugs();
 		}
 	}
@@ -619,6 +648,9 @@ public class Branch : MonoBehaviour {
 		isInfested = false;
 		infestationTime = -1;
 
+		if(manager != null)
+			manager.GetComponent<BonsaiManager>().removeInfestedBranch();
+
 		//Destroy each bug
 		GameObject[] bugs = new GameObject[numBugs];
 		int counter = 0;
@@ -656,6 +688,9 @@ public class Branch : MonoBehaviour {
 	void addDeathToBranch() {
 		isDead = true;
 		deathTime = age;
+
+		if(manager != null)
+			manager.GetComponent<BonsaiManager>().addDeadBranch();
 
 		for(int i = transform.childCount - 1; i > 2; i--) {
 			if(transform.GetChild(i).GetComponent<Leaf>() != null) {
