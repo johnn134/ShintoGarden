@@ -40,10 +40,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e00373db1984284696937ccd69ee585, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  branch: {fileID: 0}
-  stem: {fileID: 0}
-  bud: {fileID: 0}
-  leaf: {fileID: 0}
+  maxLeaves: 60
+  maxBranches: 45
+  growthCycleTime: 60
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
