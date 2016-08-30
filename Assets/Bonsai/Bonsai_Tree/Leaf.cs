@@ -39,8 +39,13 @@ public class Leaf : MonoBehaviour {
 				transform.parent.GetComponent<Branch>().registerLeafRemoved();
 			}
 		}
-		if (manager != null)
+		if(manager != null) {
 			manager.GetComponent<BonsaiManager>().removeLeaf();
+
+			if(isDead) {
+				manager.GetComponent<BonsaiManager>().removeDeadLeaf();
+			}
+		}
 	}
 
 	// Update is called once per frame
@@ -103,6 +108,7 @@ public class Leaf : MonoBehaviour {
 		transform.GetChild(0).GetComponent<HyperObject>().WMove(GameObject.FindGameObjectWithTag("Player").GetComponent<HyperCreature>().w);
 
 		isDead = true;
+		manager.GetComponent<BonsaiManager>().addDeadLeaf();
 	}
 
 	/*

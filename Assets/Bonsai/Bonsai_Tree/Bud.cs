@@ -9,11 +9,14 @@ public class Bud : MonoBehaviour {
 	int w;
 
 	bool isLeaf;        //Tells whether this bud will grow into a leaf or branch
+	bool didGrow;
 
 	static int ID = 0;
 
 	// Use this for initialization
 	void Start() {
+		didGrow = false;
+
 		//name the bud
 		this.gameObject.name = "Bud_" + ID;
 		ID++;
@@ -22,6 +25,15 @@ public class Bud : MonoBehaviour {
 	// Update is called once per frame
 	void Update() {
 
+	}
+
+	void OnDestroy() {
+		if(manager != null && !didGrow) {
+			if(isLeaf)
+				manager.GetComponent<BonsaiManager>().removeLeaf();
+			else
+				manager.GetComponent<BonsaiManager>().removeBranch();
+		}
 	}
 
 	/*
@@ -41,8 +53,6 @@ public class Bud : MonoBehaviour {
 
 			newLeaf.transform.GetComponent<Leaf>().setManager(manager);
 			transform.parent.GetComponent<Branch>().registerLeafAdded();
-			manager.GetComponent<BonsaiManager>().addLeaf();
-			Destroy(this.gameObject);
 		}
 		else {
 			GameObject newBranch = Instantiate(Resources.Load("Bonsai/BranchPrefab"), Vector3.zero, Quaternion.identity, transform.parent) as GameObject;
@@ -57,9 +67,10 @@ public class Bud : MonoBehaviour {
 
 			newBranch.transform.GetComponent<Branch>().setManager(manager);
 			transform.parent.GetComponent<Branch>().registerBranchAdded();
-			manager.GetComponent<BonsaiManager>().addBranch();
-			Destroy(this.gameObject);
 		}
+		didGrow = true;
+
+		Destroy(this.gameObject);
 	}
 
 	/*

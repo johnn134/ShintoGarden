@@ -3,12 +3,8 @@ using System.Collections;
 
 public class BonsaiManager : MonoBehaviour {
 
-    public GameObject branch;
-    public GameObject bud;
-    public GameObject leaf;
-
-	public int maxLeaves = 30;
-	public int maxBranches = 30;
+	public int maxLeaves = 60;
+	public int maxBranches = 45;
 
 	public float growthCycleTime = 60.0f;
 
@@ -62,6 +58,9 @@ public class BonsaiManager : MonoBehaviour {
 			processGrowthCycle();
 		}
 		*/
+
+		Debug.Log("Branches: N-" + numBranches + ", D-" + numDeadBranches + ", I-" + numInfestedBranches
+					+ "; Leaves: N-" + numLeaves + ", D-" + numDeadLeaves);
 	}
 
 	void processGrowthCycle() {
