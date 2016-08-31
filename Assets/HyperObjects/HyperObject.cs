@@ -37,7 +37,7 @@ public class HyperObject : MonoBehaviour {
 			StartCoroutine(ColorTrans(newW, 1.0f));
 		}
 		else{
-            float targA = .2f;
+            float targA = .5f;
             if (vanishWhenTransparent)
                 targA = 0.0f;
 
