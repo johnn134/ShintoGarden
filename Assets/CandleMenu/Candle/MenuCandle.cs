@@ -92,6 +92,7 @@ public class MenuCandle : MonoBehaviour {
 	 * Quit the game
 	 */
 	bool actionQuit() {
+		Debug.Log("Quitting");
 		Application.Quit();
 		return true;
 	}

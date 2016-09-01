@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Player
   - Tool
+  - Fire
+  - WashBasin
   layers:
   - Default
   - TransparentFX
